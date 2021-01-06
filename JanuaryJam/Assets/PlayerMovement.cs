@@ -1,4 +1,4 @@
-// Some stupid rigidbody based movement by Dani
+
 
 using System;
 using UnityEngine;
@@ -6,45 +6,44 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour {
 
     //Assingables
-    public Transform playerCam;
-    public Transform orientation;
+        public Transform playerCam;
+        public Transform orientation;
     
     //Other
-    private Rigidbody rb;
+        private Rigidbody rb;
 
     //Rotation and look
-    private float xRotation;
-    private float sensitivity = 50f;
-    private float sensMultiplier = 1f;
+        private float xRotation;
+        private float sensitivity = 50f;
+        private float sensMultiplier = 1f;
     
     //Movement
-    public float moveSpeed = 4500;
-    public float maxSpeed = 20;
-    public bool grounded;
-    public LayerMask whatIsGround;
-    
-    public float counterMovement = 0.175f;
-    private float threshold = 0.01f;
-    public float maxSlopeAngle = 35f;
+        public float moveSpeed = 4500;
+        public float maxSpeed = 20;
+        public bool grounded;
+        public LayerMask whatIsGround;
+        public float counterMovement = 0.175f;
+        private float threshold = 0.01f;
+        public float maxSlopeAngle = 35f;
 
     //Crouch & Slide
-    private Vector3 crouchScale = new Vector3(1, 0.5f, 1);
-    private Vector3 playerScale;
-    public float slideForce = 400;
-    public float slideCounterMovement = 0.2f;
+        private Vector3 crouchScale = new Vector3(1, 0.5f, 1);
+        private Vector3 playerScale;
+        public float slideForce = 400;
+        public float slideCounterMovement = 0.2f;
 
     //Jumping
-    private bool readyToJump = true;
-    private float jumpCooldown = 0.25f;
-    public float jumpForce = 550f;
+        private bool readyToJump = true;
+        private float jumpCooldown = 0.5f;
+        public float jumpForce = 550f;
     
     //Input
-    float x, y;
-    bool jumping, sprinting, crouching;
+        float x, y;
+        bool jumping, sprinting, crouching;
     
     //Sliding
-    private Vector3 normalVector = Vector3.up;
-    private Vector3 wallNormalVector;
+        private Vector3 normalVector = Vector3.up;
+        private Vector3 wallNormalVector;
 
     void Awake() {
         rb = GetComponent<Rigidbody>();
@@ -56,7 +55,6 @@ public class PlayerMovement : MonoBehaviour {
         Cursor.visible = false;
     }
 
-    
     private void FixedUpdate() {
         Movement();
     }
@@ -66,10 +64,7 @@ public class PlayerMovement : MonoBehaviour {
         Look();
     }
 
-    /// <summary>
-    /// Find user input. Should put this in its own class but im lazy
-    /// </summary>
-    private void MyInput() {
+    private void MyInput() { /// Find user input. Should put this in its own class but im lazy
         x = Input.GetAxisRaw("Horizontal");
         y = Input.GetAxisRaw("Vertical");
         jumping = Input.GetButton("Jump");
@@ -167,6 +162,7 @@ public class PlayerMovement : MonoBehaviour {
     }
     
     private float desiredX;
+
     private void Look() {
         float mouseX = Input.GetAxis("Mouse X") * sensitivity * Time.fixedDeltaTime * sensMultiplier;
         float mouseY = Input.GetAxis("Mouse Y") * sensitivity * Time.fixedDeltaTime * sensMultiplier;
@@ -209,12 +205,8 @@ public class PlayerMovement : MonoBehaviour {
         }
     }
 
-    /// <summary>
-    /// Find the velocity relative to where the player is looking
-    /// Useful for vectors calculations regarding movement and limiting movement
-    /// </summary>
-    /// <returns></returns>
-    public Vector2 FindVelRelativeToLook() {
+    public Vector2 FindVelRelativeToLook() { /// Find the velocity relative to where the player is looking
+        /// Useful for vectors calculations regarding movement and limiting movement
         float lookAngle = orientation.transform.eulerAngles.y;
         float moveAngle = Mathf.Atan2(rb.velocity.x, rb.velocity.z) * Mathf.Rad2Deg;
 
@@ -234,11 +226,8 @@ public class PlayerMovement : MonoBehaviour {
     }
 
     private bool cancellingGrounded;
-    
-    /// <summary>
-    /// Handle ground detection
-    /// </summary>
-    private void OnCollisionStay(Collision other) {
+
+    private void OnCollisionStay(Collision other) { /// Handle ground detection
         //Make sure we are only checking for walkable layers
         int layer = other.gameObject.layer;
         if (whatIsGround != (whatIsGround | (1 << layer))) return;
@@ -266,5 +255,4 @@ public class PlayerMovement : MonoBehaviour {
     private void StopGrounded() {
         grounded = false;
     }
-    
 }
