@@ -68,12 +68,12 @@ public class PlayerMovement : MonoBehaviour {
         x = Input.GetAxisRaw("Horizontal");
         y = Input.GetAxisRaw("Vertical");
         jumping = Input.GetButton("Jump");
-        crouching = Input.GetKey(KeyCode.LeftControl);
+        crouching = Input.GetKey(KeyCode.Q);
       
         //Crouching
-        if (Input.GetKeyDown(KeyCode.LeftControl))
+        if (Input.GetKeyDown(KeyCode.Q))
             StartCrouch();
-        if (Input.GetKeyUp(KeyCode.LeftControl))
+        if (Input.GetKeyUp(KeyCode.Q))
             StopCrouch();
     }
 
@@ -104,7 +104,7 @@ public class PlayerMovement : MonoBehaviour {
         CounterMovement(x, y, mag);
         
         //If holding jump && ready to jump, then jump
-        if (readyToJump && jumping) Jump();
+        if (readyToJump && jumping && grounded) Jump();
 
         //Set max speed
         float maxSpeed = this.maxSpeed;
@@ -141,7 +141,7 @@ public class PlayerMovement : MonoBehaviour {
     private void Jump() {
         if (grounded && readyToJump) {
             readyToJump = false;
-
+            grounded = false;
             //Add jump forces
             rb.AddForce(Vector2.up * jumpForce * 1.5f);
             rb.AddForce(normalVector * jumpForce * 0.5f);
@@ -159,6 +159,7 @@ public class PlayerMovement : MonoBehaviour {
     
     private void ResetJump() {
         readyToJump = true;
+        //grounded = true;
     }
     
     private float desiredX;
@@ -230,14 +231,19 @@ public class PlayerMovement : MonoBehaviour {
     private void OnCollisionStay(Collision other) { /// Handle ground detection
         //Make sure we are only checking for walkable layers
         int layer = other.gameObject.layer;
-        if (whatIsGround != (whatIsGround | (1 << layer))) return;
+        if (whatIsGround != (whatIsGround | (1 << layer)))
+        {
+            grounded = true;
+            return;
+        }
+            
 
         //Iterate through every collision in a physics update
         for (int i = 0; i < other.contactCount; i++) {
             Vector3 normal = other.contacts[i].normal;
             //FLOOR
             if (IsFloor(normal)) {
-                grounded = true;
+                
                 cancellingGrounded = false;
                 normalVector = normal;
                 CancelInvoke(nameof(StopGrounded));
@@ -247,6 +253,7 @@ public class PlayerMovement : MonoBehaviour {
         //Invoke ground/wall cancel, since we can't check normals with CollisionExit
         float delay = 3f;
         if (!cancellingGrounded) {
+            
             cancellingGrounded = true;
             Invoke(nameof(StopGrounded), Time.deltaTime * delay);
         }
