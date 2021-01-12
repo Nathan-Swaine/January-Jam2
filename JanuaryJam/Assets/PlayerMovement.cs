@@ -2,12 +2,12 @@
 
 using System;
 using UnityEngine;
-
 public class PlayerMovement : MonoBehaviour {
 
     //Assingables
         public Transform playerCam;
         public Transform orientation;
+        public Transform Head;
     
     //Other
         private Rigidbody rb;
@@ -36,6 +36,7 @@ public class PlayerMovement : MonoBehaviour {
         private bool readyToJump = true;
         private float jumpCooldown = 0.5f;
         public float jumpForce = 550f;
+
     
     //Input
         float x, y;
@@ -145,13 +146,15 @@ public class PlayerMovement : MonoBehaviour {
             //Add jump forces
             rb.AddForce(Vector2.up * jumpForce * 1.5f);
             rb.AddForce(normalVector * jumpForce * 0.5f);
-            
+
+            StartCoroutine(YourName());
+           
             //If jumping while falling, reset y velocity.
             Vector3 vel = rb.velocity;
-            if (rb.velocity.y < 0.5f)
-                rb.velocity = new Vector3(vel.x, 0, vel.z);
-            else if (rb.velocity.y > 0) 
-                rb.velocity = new Vector3(vel.x, vel.y / 2, vel.z);
+                if (rb.velocity.y < 0.5f)
+                    rb.velocity = new Vector3(vel.x, 0, vel.z);
+                else if (rb.velocity.y > 0) 
+                    rb.velocity = new Vector3(vel.x, vel.y / 2, vel.z);
             
             Invoke(nameof(ResetJump), jumpCooldown);
         }
@@ -261,5 +264,18 @@ public class PlayerMovement : MonoBehaviour {
 
     private void StopGrounded() {
         grounded = false;
+    }
+}
+
+
+
+public class Wait : MonoBehaviour
+{
+    IEnumerator YourName()
+    {
+        //you can replace 3 with the amount of seconds to wait
+        //for a time like 1.2 seconds, use 1.2f (to show it's a float)
+        yield return new WaitForSeconds(3);
+        Debug.Log("Finished waiting!");
     }
 }
